@@ -203,121 +203,57 @@ public class TimeOfDayConsumer {
 ```
 The annotations here expose and provide the ability for a caller to get answers from our service. 
 
-On to the caller's code.  In this example, I am only providing the testing side of the code.  And it's organized as Cucumber for Java code with Junit and Hamcrest.  Let's start with the tests themselves.
-```Gherkin
-Feature: Time of day, formated as text and formatted as spoken words
-
-  Scenario Outline: Check Standard Formatted
-
-    When the hour is "<hour>"
-    And the minute is "<minute>"
-    And the second is "<second>"
-    And I should see standard formatting of "<result>"
-
-    Examples:
-      |hour|minute|second|result  |
-      |10  |11    |12    |10:11:12|
-      |23  |0     |5     |23:00:05|
-
-  Scenario Outline: Check Spoken Formatted
-
-    When the hour is "<hour>"
-    And the minute is "<minute>"
-    And the second is "<second>"
-    And I should see spoken formatting of "<result>"
-
-    Examples:
-      |hour|minute|second|result                                        |
-      |9   |0     |0     |nine o'clock in the morning                   |
-      |10  |11    |12    |ten after ten o'clock in the morning          |
-      |10  |14    |35    |a quarter after ten o'clock in the morning    |
-      |22  |44    |35    |a quarter before eleven o'clock in the evening|
-      
-  Scenario: Close up Spring
-  
-    When I reach here, I'm done
-```
-The reason that I'm testing in Cucumber is that I want my tests to be more human readable.  I use the outline form of Gherkin to encourage testing of all the the edge cases that we should be testing for.  Only a small sample of the tests are written in this sample.
-
-We know that Cucumber requires some fairly boilerplate test runner code.
-```java
-package test.com.solutionsiq.timeofday.springboot;
-
-import org.junit.runner.RunWith;
-
-import cucumber.api.junit.Cucumber;
-import cucumber.api.CucumberOptions;
-
-@RunWith(Cucumber.class)
-
-@CucumberOptions(
-//      dryRun   = false,
-//      strict = true,
-//      tags     = "",
-        monochrome = false,
-        features = { "src/test/java/test/com/solutionsiq/timeofday/springboot" },
-        glue     = { "test.com.solutionsiq.timeofday.springboot" },
-        plugin   = { "pretty", "html:target/cucumber-reports/cucumber-html-report", "json:target/cucumber-reports/cucumber-json-report.json" }
-)
-
-public class TimeOfDayServiceTestRunner {
-}
-```
-The heavy lifting for the testing takes place in the stepdefs.
-```java
+On to the caller's code.  In this example, I am only providing the testing side of the code. 
+```Java
 package test.com.solutionsiq.timeofday.springboot;
 
 import com.solutionsiq.timeofday.springboot.consumer.TimeOfDayConsumer;
-import cucumber.api.java.en.When;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-
 @ComponentScan("com.solutionsiq.timeofday.springboot")
-public class TimeOfDayServiceTestStepdefs {
+public class TimeOfDayServiceTest {
 
-    private static AnnotationConfigApplicationContext context = null;
+    private AnnotationConfigApplicationContext context = null;
 
-    private int hour = -1;
-    private int minute = -1;
-    private int second = -1;
-
-    @When("^the hour is \"([^\"]*)\"$")
-    public void the_hour_is(String hour) throws Throwable {
-        if (context == null) {
-            context = new AnnotationConfigApplicationContext(TimeOfDayServiceTestStepdefs.class);
-        }
-        this.hour = Integer.parseInt(hour);
+    @Before
+    public void setUp() throws Exception {
+        context = new AnnotationConfigApplicationContext(TimeOfDayServiceTest.class);
     }
 
-    @When("^the minute is \"([^\"]*)\"$")
-    public void the_minute_is(String minute) throws Throwable {
-        this.minute = Integer.parseInt(minute);
-    }
-
-    @When("^the second is \"([^\"]*)\"$")
-    public void the_second_is(String second) throws Throwable {
-        this.second = Integer.parseInt(second);
-    }
-
-    @When("^I should see standard formatting of \"([^\"]*)\"$")
-    public void i_should_see_standard_formatting_of(String formattedString) throws Throwable {
-        TimeOfDayConsumer timeOfDayConsumer = context.getBean(TimeOfDayConsumer.class);
-        assertThat(timeOfDayConsumer.getFormattedTimeOfDay(hour, minute, second),is(formattedString));
-    }
-
-    @When("^I should see spoken formatting of \"([^\"]*)\"$")
-    public void i_should_see_spoken_formatting_of(String formattedString) throws Throwable {
-        TimeOfDayConsumer timeOfDayConsumer = context.getBean(TimeOfDayConsumer.class);
-        assertThat(timeOfDayConsumer.getFormattedTimeOfDaySpokenWords(hour, minute, second),is(formattedString));
-    }
-    
-    @When("^I reach here, I'm done$")
-    public void i_reach_here_I_m_done() throws Throwable {
+    @After
+    public void tearDown() throws Exception {
         context.close();
+    }
+
+    @Test
+    public void checkTimeOfDayFormatted101112() {
+        TimeOfDayConsumer timeOfDayConsumer = context.getBean(TimeOfDayConsumer.class);
+        assertThat(timeOfDayConsumer.getFormattedTimeOfDay(10,11,12),is(("10:11:12")));
+    }
+
+    @Test
+    public void checkTimeOfDaySpoken101112() {
+        TimeOfDayConsumer timeOfDayConsumer = context.getBean(TimeOfDayConsumer.class);
+        assertThat(timeOfDayConsumer.getFormattedTimeOfDaySpokenWords(10,11,12),is(("ten after ten o'clock in the morning")));
+    }
+
+    @Test
+    public void checkTimeOfDaySpoken101435() {
+        TimeOfDayConsumer timeOfDayConsumer = context.getBean(TimeOfDayConsumer.class);
+        assertThat(timeOfDayConsumer.getFormattedTimeOfDaySpokenWords(10,14,35),is(("a quarter after ten o'clock in the morning")));
+    }
+
+    @Test
+    public void checkTimeOfDaySpoken224435() {
+        TimeOfDayConsumer timeOfDayConsumer = context.getBean(TimeOfDayConsumer.class);
+        assertThat(timeOfDayConsumer.getFormattedTimeOfDaySpokenWords(22,44,35),is(("a quarter before eleven o'clock in the evening")));
     }
 
 }
@@ -330,14 +266,16 @@ First, look at the annotation right before the class declaration.
 ```
 This annotation tells Spring where to find beans to satisfy calls to the consumer side of the beans configured with Spring.
 
-Spring comes to life and starts scanning when it establishes it's context with
+It's important that each test be able to use the Spring context before the test and destroy it after the test
 ```java
-        if (context == null) {
-            context = new AnnotationConfigApplicationContext(TimeOfDayServiceTestStepdefs.class);
-        }
+    @Before
+    public void setUp() throws Exception {
+        context = new AnnotationConfigApplicationContext(TimeOfDayServiceTest.class);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        context.close();
+    }
 ```
-The context can be a costly operation.  That's why I made it static within the class.
-
-This code is a litttle bit of a kludge in it.  The  context.close().
-
-And don't forget to look at the pretty cucumber reports located at target/cucumber-pretty-reports/cucumber-html-reports/overview-features.html and target/cucumber-pretty-reports/cucumber-html-reports/overview-steps.html.
+And with that, we've successfully used Spring Boot Dependency Injection to gain access to our code using autowiring.

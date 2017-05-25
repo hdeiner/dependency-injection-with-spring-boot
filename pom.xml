@@ -48,57 +48,9 @@
             <version>2.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>1.2.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>1.2.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-jvm</artifactId>
-            <version>1.2.4</version>
-            <type>pom</type>
-        </dependency>
-
-        <dependency>
-            <groupId>net.masterthought</groupId>
-            <artifactId>maven-cucumber-reporting</artifactId>
-            <version>3.7.0</version>
-        </dependency>
-
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>net.masterthought</groupId>
-                <artifactId>maven-cucumber-reporting</artifactId>
-                <version>3.7.0</version>
-                <executions>
-                    <execution>
-                        <id>execution</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <projectName>Dependency Injection With Spring Boot</projectName>
-                            <outputDirectory>${project.basedir}/target/cucumber-pretty-reports</outputDirectory>
-                            <cucumberOutput>${project.basedir}/target/cucumber-reports/cucumber-json-report.json</cucumberOutput>
-                            <parallelTesting>false</parallelTesting>
-                        </configuration>
-                    </execution>
-
-                </executions>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -116,10 +68,6 @@
                     <version>2.19.1</version>
                     <configuration>
                         <testFailureIgnore>true</testFailureIgnore>
-                        <includes>
-                            <include>**/TimeOfDayServiceTestRunner.java</include>
-                            <include>**/BadCodeTest.java</include>
-                        </includes>
                     </configuration>
                 </plugin>
             </plugins>
