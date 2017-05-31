@@ -1,4 +1,4 @@
-Dependency Inversion With Spring Boot
+Dependency Injection With Spring Boot
 =====================================
 
 ### Status
