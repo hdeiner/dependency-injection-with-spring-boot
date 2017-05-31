@@ -1,5 +1,9 @@
 Dependency Inversion With Spring Boot
 =====================================
+
+### Status
+[![Build Status](https://travis-ci.org/hdeiner/dependency-injection-with-spring-boot.svg?branch=master)](https://travis-ci.org/hdeiner/dependency-injection-with-spring-boot)
+
 Guide to this code
 ------------------
 In this sample, we are going to implement a service that returns formatted versions of the time of day.
